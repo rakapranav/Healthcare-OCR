@@ -4,14 +4,13 @@ from google.cloud import vision
 class OCRClient(object):
     def __init__(self, image, language=['en']):
         self.client = vision.ImageAnnotatorClient()
-        # import pdb;pdb.set_trace()
         self.language = language
         self.image_context = None
         self._ocr_cache = None
 
         self.set_image(image)
 
-        self.image_context = vision.types.ImageContext(language_hints=['en'])
+        self.image_context = vision.types.ImageContext(language_hints=language)
 
     def set_image(self, image):
         image.seek(0)

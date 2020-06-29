@@ -337,6 +337,9 @@ def process_input_from_request(request):
     file_name = mime_type = ""
     try:
         image = request.FILES['image']
+        print("IMAGE ",image)
+        # import pdb;pdb.set_trace()
+
     except MultiValueDictKeyError:
         try:
             file_url = request.POST['image']
@@ -349,14 +352,15 @@ def process_input_from_request(request):
                 raise Exception
 
         except MultiValueDictKeyError:
-            return {
+            return HttpResponse({
                        'status':'FAIL',
                         'status_code':204,
                         'message':"No Content",
                         'file_name':None,
                         'file_type':None,
                         'url':str(request.path)
-                    } , [], "", "", ""
+                    }) , [], "", "", ""
+
         except Exception as err:
             return HttpResponse({
                         'status':'FAIL',

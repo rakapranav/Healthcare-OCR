@@ -95,19 +95,22 @@ class IUtils():
         # perform the actual rotation and return the image
         return cv2.warpAffine(image, M, (nW, nH))
 
-    def rotate_response_bounds(self, image, doc_page_id):
+    def rotate_response_bounds(self, filename, doc_page_id):
         self.response = self.vision_client.response
 
         detected_words = FuzzyComparator(detect_words(self.response.full_text_annotation.text))
+        print("DETECTED WORDS")
         if not detected_words:
             return {"status":"NOT_PROCESSED", "status_code": "412", "error_message": "Error reading image file"}
 
         reference_bounds = self.get_straightening_reference_bounds(detected_words, ['REQUISITION','FORM','Healthcare','Patient'])
+        print("REFERENCE BOUNDS")
         if not reference_bounds:
             self.rotated_img = self.image
             return {"status":"NOT_PROCESSED","status_code": "412",  "error_message" : "Poor/Invalid/Not Supported. Cannot identify keywords"}
 
         theta = self.get_rotation_angle(reference_bounds)
+        print("THETA")
 
         if self.flip_if_reverse(reference_bounds):
             theta += 180
@@ -128,8 +131,8 @@ class IUtils():
             bb1[i] = [(float(x0), float(y0)), (float(x1), float(y1)),
                       (float(x2), float(y2)), (float(x3), float(y3))]
 
-        # img_orig = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
-        img_orig = image
+        img_orig = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
+        # img_orig = image
         self.rotated_img = self.rotate_bound(img_orig, theta)
 
         (heigth, width) = img_orig.shape[:2]

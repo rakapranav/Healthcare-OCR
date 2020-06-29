@@ -14,11 +14,12 @@ from .utils import process_input_from_request
 from google.protobuf.json_format import MessageToJson
 from google.api_core.exceptions import InvalidArgument
 import traceback
+from .extract import REQ_FORM
 
 model_path = 'healthcare/models/requisition_form.hdf5'
-model_kyc = load_model(model_path)
-model_kyc._make_predict_function()
-graph_kyc = tf.get_default_graph()
+model = load_model(model_path)
+model._make_predict_function()
+graph = tf.get_default_graph()
 
 
 def doc_classifier(image, model, graph):
@@ -108,15 +109,29 @@ def requisition_form(request):
             try:
                 image_client = IUtils(image_)
                 image_client.call_vision()
+                print("IMAGE CLIENT")
+                # classifier = doc_classifier(image_client.image, model, graph)
 
-                classifier = doc_classifier(image_client.image, model_kyc, graph_kyc)
+                # print('Classifier ..... ',classifier)
+                doc_class = 'Requisition_Form'
 
                 any_error = image_client.rotate_response_bounds(image_, doc_class)
+                print("ANY ERROR")
                 if any_error:
+                    print("ERROR OCCCURED ")
                     response = any_error.as_dict()
                     continue
 
                 serialized = MessageToJson(image_client.response, doc_class, image_client.rotated_img.shape)
+                print("Serialize")
+                vision_response = json.loads(serialized)
+                height = image_client.rotated_img.shape[0]
+                width = image_client.rotated_img.shape[1]
+                file_path = image_
+
+                response = json.loads(REQ_FORM(vision_response, [height, width]).as_unified_json())
+
+
 
 
             except InvalidArgument as err:
@@ -147,11 +162,11 @@ def requisition_form(request):
         return response
 
     except Exception as err:
-        response = HttpResponse({
+        response = HttpResponse(json.dump({
                         'status':'FAIL',
                         'status_code':"500",
                         'message':str(err),
                         'trace_back':str(traceback.format_exc())
-                    })
+                    }))
         return response
 
