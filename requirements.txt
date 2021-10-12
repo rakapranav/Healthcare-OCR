@@ -50,7 +50,7 @@ Markdown==3.2.2
 matplotlib==3.2.2
 mock==4.0.2
 numpy==1.16.2
-opencv-python==4.1.2.30
+opencv-python==4.2.0.32
 pandas==0.25.3
 Pillow==7.1.2
 protobuf==3.12.2
