@@ -53,7 +53,7 @@ numpy==1.16.2
 opencv-python==4.1.2.30
 pandas==0.25.3
 Pillow==7.1.2
-protobuf==3.12.2
+protobuf==3.15.0
 psycopg2-binary==2.8.4
 pyasn1==0.4.7
 pyasn1-modules==0.2.7
